@@ -1,0 +1,26 @@
+<div class="col-md-8">
+
+<% if @post.present? %>
+  <% @post.errors.each do |attr, msg| %>
+    <div class="alert alert-danger" role="alert">
+      <%= msg %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= form_for(:post, url: path, method: "post") do %>
+  <div class="form-group">
+    <%= label(:post, :title, "Заголовок") %>
+    <%= text_field(:post, :title, class: "form-control") %>
+  </div>
+  <div class="form-group">
+    <%= label(:post, :topic, "Выберите тему") %>
+    <%= select(:post, :topic, options_from_collection_for_select(@topics, "id", "title", @post.present? ? @post.id : nil ), {}, {class: "form-control"}) %>
+  </div>
+  <div class="form-group">
+    <%= label(:post, :body, "Текст") %>
+    <%= text_area(:post, :body, class: "form-control", rows: "10") %>
+  </div>
+   <%= submit_tag(action == "edit" ? "Сохранить" : "Создать", class: "btn btn-primary") %>
+<% end %>
+</div>
