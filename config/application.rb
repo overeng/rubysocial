@@ -5,7 +5,7 @@ require_relative 'boot'
 # Replace `require 'rails/all'` with just the libs that you want and 
 # exclude the rest
 require 'active_record/railtie'
-# require 'active_storage/engine'
+require 'active_storage/engine'
 require 'action_controller/railtie'
 require 'action_view/railtie'
 require 'action_mailer/railtie'
