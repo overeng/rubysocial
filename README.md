@@ -1,24 +1,4 @@
-# README
+# Соцсеть про животных на Ruby On Rails 6
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Это исходники к серии видео, которые можно найти по [ссылке](https://www.youtube.com/playlist?list=PLnsrJGFjuJ5xPsASOFcKT9JDYi6lHOdyq).
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
