@@ -52,4 +52,10 @@ FactoryBot.define do
           title { "Кролики" }
         end  
     end
+
+    factory :comment do
+      body  { "Очень милый котик" }
+      parent_id { 0 }
+      association :post, factory: :post
+    end  
   end
