@@ -58,6 +58,10 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+    babel-source (5.8.35)
+    babel-transpiler (0.7.0)
+      babel-source (>= 4.0, < 6)
+      execjs (~> 2.0)
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
@@ -73,8 +77,10 @@ GEM
       xpath (~> 3.2)
     childprocess (3.0.0)
     concurrent-ruby (1.1.6)
+    connection_pool (2.2.3)
     crass (1.0.6)
     erubi (1.9.0)
+    execjs (2.7.0)
     factory_bot (6.0.1)
       activesupport (>= 5.0.0)
     factory_bot_rails (6.0.0)
@@ -145,6 +151,12 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    react-rails (2.6.1)
+      babel-transpiler (>= 0.7.0)
+      connection_pool
+      execjs
+      railties (>= 3.2)
+      tilt
     regexp_parser (1.7.0)
     rubyzip (2.3.0)
     sass-rails (6.0.0)
@@ -212,6 +224,7 @@ DEPENDENCIES
   pg (~> 1.2)
   puma (~> 4.1)
   rails (~> 6.0.3)
+  react-rails
   sass-rails (>= 6)
   selenium-webdriver
   spring
