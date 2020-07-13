@@ -27,7 +27,6 @@ class CommentsApp extends React.Component {
   handleSubmitComment(comment) {
     var comments = this.state.comments;
   
-    var updatedComments = comments.concat([comment]);
     $.ajax({
       url: "/comments/create/" + this.props.post_id ,
       dataType: 'json',
@@ -41,6 +40,7 @@ class CommentsApp extends React.Component {
           }
         } else {
           $('div#comment_error').html('<div class="alert alert-success" role="alert">Комментарий добавлен</div>');
+          var updatedComments = comments.concat([data.comment]);
           this.setState({comments: updatedComments});
         }
       }.bind(this),

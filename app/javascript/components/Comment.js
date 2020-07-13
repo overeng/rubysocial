@@ -8,7 +8,7 @@ class Comment extends React.Component {
 
     this.state = {
       replyFormShow: false,
-      replies: this.props.replies
+      replies: this.props.replies || []
     }
 
     this.showHideReplyForm = this.showHideReplyForm.bind(this)
@@ -48,9 +48,9 @@ class Comment extends React.Component {
 
   render () {
     var repliesBox=''
-    if (this.props.replies != null && 
-      Array.isArray(this.props.replies) && 
-      this.props.replies.length) {
+    if (this.state.replies != null && 
+      Array.isArray(this.state.replies) && 
+      this.state.replies.length) {
         repliesBox = <Replies replies={this.state.replies} />
       } 
 
