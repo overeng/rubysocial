@@ -25,7 +25,6 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/purrpurr_test
           RAILS_ENV: test
         run: |
-          sudo apt-get -yqq install libpq-dev
           bin/rails db:create
           bin/rails db:prepare
           bin/rails test
