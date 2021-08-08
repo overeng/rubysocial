@@ -1,14 +1,10 @@
-name: Publish release
-on: [push]
+name: Test
+on: [pull_request, push]
 jobs:
   test-backend:
     services:
       db:
         image: postgres:10.8
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
         ports:
         - 5432:5432
         # needed because the postgres container does not provide a healthcheck
@@ -30,8 +26,6 @@ jobs:
           RAILS_ENV: test
         run: |
           sudo apt-get -yqq install libpq-dev
-          gem install bundler
-          bundle install --jobs 4 --retry 3
           bin/rails db:create
           bin/rails db:prepare
           bin/rails test
