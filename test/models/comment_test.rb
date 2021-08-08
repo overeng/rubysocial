@@ -18,9 +18,8 @@ class CommentTest < ActiveSupport::TestCase
     end
   end
 
-  test "fetch replies for post" do  
+  test "fetch replies for post" do
     replies = Comment.replies_for_post(@post.id)
-    byebug
     assert_equal 2, replies.length
     assert replies.key?(@comments[0].id)
     assert replies.key?(@comments[1].id)
