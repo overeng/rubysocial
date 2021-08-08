@@ -24,12 +24,12 @@ jobs:
           cmd: install
       - name: Run tests
         env:
-          DATABASE_URL: postgres://postgres:@localhost:5432/purrpurr_test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/purrpurr_test
           RAILS_ENV: test
         run: |
           sudo apt-get -yqq install libpq-dev
           gem install bundler
-          bundle install
+          bundle install --jobs 4 --retry 3
           bin/rails db:create
           bin/rails db:prepare
           bin/rails test
