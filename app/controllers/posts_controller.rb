@@ -3,13 +3,13 @@ class PostsController < ApplicationController
 
   def index
     page_token = params.has_key?(:older) ? params[:older] : params[:newer]
-    
+
     paginate(page_token)
   end
 
   def topic
     page_token = params.has_key?(:older) ? params[:older] : params[:newer]
-    
+
     @topic = Topic.find_by(alias: params[:topic])
     paginate(page_token, @topic.id)
 
@@ -21,21 +21,22 @@ class PostsController < ApplicationController
     @comments = Comment.comments_for_post(@post.id)
     @replies = Comment.replies_for_post(@post.id)
   end
-  
+
   def edit
-    @topics = Topic.all() 
+    @topics = Topic.all()
     @post = Post.find(params[:id])
   end
 
   def new
-    @topics = Topic.all() 
+    @topics = Topic.all()
   end
 
+  # change for test PR
   def create
     @post = Post.new(post_params)
     if @post.save
       redirect_to '/posts/' + @post.id.to_s
-    else  
+    else
       @topics = Topic.all()
       render 'new'
     end
@@ -45,7 +46,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     if @post.update(post_params)
       redirect_to '/posts/' + @post.id.to_s
-    else  
+    else
       @topics = Topic.all()
       render 'edit'
     end
@@ -63,10 +64,10 @@ class PostsController < ApplicationController
     if page_token.present?
       if params.has_key?(:newer)
         @posts = pagination.newer
-      else 
+      else
         @posts = pagination.older
-      end  
-    else 
+      end
+    else
       @posts = pagination.first_page
     end
 
