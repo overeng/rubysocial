@@ -60,4 +60,4 @@ jobs:
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
     - name: Copy files to S3
       run: |
-        aws s3 sync public/ s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}
+        aws s3 sync public/packs/js/ s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}/packs/js
