@@ -1,8 +1,11 @@
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
-  build:
+  backend:
+    name: Create backend release
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
@@ -29,3 +32,20 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+  frontend:
+    name: Create frontend release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+    - name: Copy files to S3
+      run: |
+        aws s3 sync public/ s3://rubysocial-frontend-releases/${{ github.ref }}
