@@ -40,12 +40,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Generate static files
+      run: rails webpack:compile
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
     - name: Copy files to S3
       run: |
-        aws s3 sync public/ s3://rubysocial-frontend-releases/${{ github.ref }}
+        aws s3 sync public/ s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}
