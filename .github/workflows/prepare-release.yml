@@ -47,7 +47,7 @@ jobs:
       with:
         cmd: install
     - name: Generate static files
-      run: rails webpack:compile
+      run: bin/rails webpack:compile
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
