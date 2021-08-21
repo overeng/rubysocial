@@ -22,7 +22,7 @@ Rails.application.configure do
   # Apache or NGINX already handles this.
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
-  config.action_controller.asset_host = ENV['CLOUDFRONT_ENDPOINT']
+  config.action_controller.asset_host = ENV['CLOUDFRONT_ENDPOINT'] + "/" + ENV['FRONTEND_VERSION']
   # Compress CSS using a preprocessor.
 
   # config.assets.css_compressor = :sass

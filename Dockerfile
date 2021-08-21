@@ -12,6 +12,7 @@ RUN yarn install
 
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
+RUN RAILS_ENV=production rails webpacker:compile
 
 COPY . .
 
