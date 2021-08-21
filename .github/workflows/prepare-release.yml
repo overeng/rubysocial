@@ -28,6 +28,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:latest
+          build-args: |
+            RAILS_PRODUCTION_KEY=${{ secrets.RAILS_PRODUCTION_KEY }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

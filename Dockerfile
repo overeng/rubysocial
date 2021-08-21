@@ -1,4 +1,5 @@
 FROM ruby:2.7.1
+ARG RAILS_PRODUCTION_KEY
 RUN bundle config --global frozen 1
 
 WORKDIR /usr/src/app
@@ -15,8 +16,7 @@ RUN bundle install
 
 COPY . .
 
-RUN RAILS_ENV=production rails webpacker:compile
-
+RUN RAILS_ENV=production RAILS_MASTER_KEY=$RAILS_PRODUCTION_KEY rails webpacker:compile
 
 CMD ["rails", "s"]
 
