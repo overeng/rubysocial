@@ -34,6 +34,7 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Extract static files
+        id: extract
         uses: shrink/actions-docker-extract@v1
         with:
           image: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:latest
