@@ -3,8 +3,8 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
-  backend:
-    name: Create backend release
+  backend-frontend:
+    name: Create backend and frontend releases
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
@@ -30,35 +30,26 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:latest
           build-args: |
             RAILS_PRODUCTION_KEY=${{ secrets.RAILS_PRODUCTION_KEY }}
-
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-  frontend:
-    name: Create frontend release
-    runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        bundler-cache: true
-    - uses: borales/actions-yarn@v2.3.0
-      with:
-        cmd: install
-    - name: Generate static files
-      run: bin/rails webpacker:compile
+      - name: Extract static files
+        uses: shrink/actions-docker-extract@v1
+        with:
+          image: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:latest
+          path: /usr/src/app/public/.
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
-    - name: Copy files to S3
-      run: |
-        aws s3 sync public/packs/js/ s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}/packs/js
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-west-2
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
+      - name: Copy static files to S3
+        run: |
+        aws s3 ${{ steps.extract.outputs.destination }} s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}/packs/js
