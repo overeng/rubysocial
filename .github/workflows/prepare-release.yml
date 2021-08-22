@@ -53,4 +53,4 @@ jobs:
 
       - name: Copy static files to S3
         run: |
-          aws s3 cp ${{ steps.extract.outputs.destination }} s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}/packs/js
+          aws s3 sync ${{ steps.extract.outputs.destination }} s3://rubysocial-frontend-releases/${{ steps.get_version.outputs.VERSION }}/packs/js
