@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bastion setup
+
+Parameters:
+  NodeImageId:
+    Description: Bastion AMI
+    Type: AWS::EC2::Image::Id
+
+  NodeVolumeSize:
+    Description: Size of hard drive
+    Type: Number
+    Default: 8
+
+  KeyName:
+    Description: EC2 key pair to allow acces to instances
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: 8
+
+  NodeInstanceType:
+    Description: Type of EC2 instance
+    Type: String
+    Default: t2.micro
+
+  VPCID:
+    Description: VPC where bastion will be deployed
+    Type: AWS::EC2::VPC::Id
+
+  SubnetIds:
+    Description: List of subnets where bastion will be deployed
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  NodeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+     GroupDescription: Security group for bastion nodes
+     VpcId: !Ref VPCID
+
+  NodeSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref NodeSecurityGroup
+      CidrIp: 0.0.0.0/0
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+
+  NodeSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref NodeSecurityGroup
+      CidrIp: 0.0.0.0/0
+      IpProtocol: -1
+
+  NodeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+  NodeRolePolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: bastion-role-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action:
+            - "*"
+          Resource: "*"
+      Roles:
+      - !Ref NodeRole
+
+  NodeInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/bastion/"
+      Roles:
+      - !Ref NodeRole
+
+  NodeGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      DesiredCapacity: 1
+      LaunchConfigurationName: !Ref NodeLaunchConfig
+      MinSize: 1
+      MaxSize: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      Tags:
+        - Key: Project
+          Value: Linux Bastion
+          PropagateAtLaunch: true
+
+        - Key: Name
+          Value: Bastion Server
+          PropagateAtLaunch: true
+
+  NodeLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      InstanceType: !Ref NodeInstanceType
+      ImageId: !Ref NodeImageId
+      KeyName: !Ref KeyName
+      SecurityGroups:
+      - !Ref NodeSecurityGroup
+      IamInstanceProfile: !Ref NodeInstanceProfile
+      BlockDeviceMappings:
+      - DeviceName: /dev/xvda
+        Ebs:
+          VolumeSize: !Ref NodeVolumeSize
+          VolumeType: gp2
+          DeleteOnTermination: true

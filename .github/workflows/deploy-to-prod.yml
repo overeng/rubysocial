@@ -1,0 +1,46 @@
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (ex. v0.1)'
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy rubysocial to production cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - uses: prepor/action-aws-iam-authenticator@master
+      - run: aws-iam-authenticator version
+
+      - uses: azure/setup-helm@v1
+        with:
+          id: install
+
+      - name: Install kube config
+        env:
+          INPUT_KUBECONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          mkdir ~/.kube/ || true
+          if [ -f "~/.kube/config" ]; then
+            echo -e "\033[36mExisting kubeconfig found, using that and ignoring input\033[0m"
+          else
+            echo -e "\033[36mUsing kubeconfig from input\033[0m"
+            echo "${INPUT_KUBECONFIG}" > ~/.kube/config
+          fi
+          chmod 700 ~/.kube/config
+      - run: wc -l
+
+      - name: Deploy to Kubernetes
+        run:
+          helm upgrade rubysocial ./deployment/helm/rubysocial/ --install --wait --atomic  --set=version=${{ github.event.inputs.version }} --kubeconfig ~/.kube/config

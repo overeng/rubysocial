@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rails-deployment
+  labels:
+    app: rails-backend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: rails-backend
+  template:
+    metadata:
+      labels:
+        app: rails-backend
+    spec:
+      containers:
+      - name: rubysocial
+        image: almaleksia/rubysocial:v0.2
+        ports:
+        - containerPort: 3000
+        env:
+          - name: RAILS_ENV
+            value: production
+          - name: RAILS_MASTER_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rails-master-key
+                key: rails-master-key
+          - name: DATABASE_HOST
+            value: rubysocial.clvkp6x5sadb.eu-central-1.rds.amazonaws.com
+          - name: DATABASE_USERNAME
+            value: postgres
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-password
+                key: database-password
+          - name: STATIC_FILES_ENDPOINT
+            value: https://rubysocial-static.s3.eu-central-1.amazonaws.com
+          - name: FRONTEND_VERSION
+            value: v0.2

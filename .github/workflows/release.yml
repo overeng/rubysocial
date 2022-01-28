@@ -1,0 +1,56 @@
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+jobs:
+  backend-frontend:
+    name: Create backend and frontend releases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_LOGIN }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:${{ steps.get_version.outputs.VERSION }}
+          build-args: |
+            RAILS_KEY=${{ secrets.RAILS_KEY }}
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Extract static files
+        id: extract
+        uses: shrink/actions-docker-extract@v1
+        with:
+          image: ${{ secrets.DOCKER_HUB_LOGIN }}/rubysocial:${{ steps.get_version.outputs.VERSION }}
+          path: /usr/src/app/public/.
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Copy static files to S3
+        run: |
+          aws s3 sync ${{ steps.extract.outputs.destination }}/packs s3://rubysocial-static/${{ steps.get_version.outputs.VERSION }}/packs

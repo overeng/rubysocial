@@ -1,0 +1,30 @@
+name: Test
+on: [push]
+jobs:
+  test-backend:
+    services:
+      db:
+        image: postgres:10.8
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/purrpurr_test
+          RAILS_ENV: test
+        run: |
+          bin/rails db:create
+          bin/rails db:prepare
+          bin/rails test
