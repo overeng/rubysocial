@@ -42,6 +42,8 @@
 
 ## Часть 1: Автотесты
 
+Репозиторий для форка: https://github.com/overeng/rubysocial
+
 Конфиг из видео:
 
 https://github.com/overeng/rubysocial/blob/7aae1703917c69e05993ee219b8f3e7cb16ca3b5/.github/workflows/test.yml#L1-L30
